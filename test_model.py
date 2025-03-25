@@ -11,7 +11,7 @@ from torch.utils.data import TensorDataset, DataLoader, RandomSampler, Sequentia
 # GPU
 device = torch.device("cpu")
 
-df = pd.read_csv(r"C:\Users\jcyr9\Downloads\Processed_Political_Bias_with_BERT (3).csv")
+df = pd.read_csv("Processed_Political_Bias_with_BERT(3).csv")
 
 # Split the dataset
 train_text, temp_text, train_labels, temp_labels = train_test_split(df['Text'], df['Bias'], random_state=2018, test_size=0.3, stratify=df['Bias'])
@@ -276,7 +276,7 @@ valid_losses=[]
 #for each epoch
 for epoch in range(epochs):
     
-    print('\ Epoch {:} / {:}'.format(epoch+1, epochs))
+    print('Epoch {:} / {:}'.format(epoch+1, epochs))
     
     #train model
     train_loss, _=train()
@@ -317,3 +317,6 @@ from sklearn.exceptions import UndefinedMetricWarning
 # Suppress specific warnings
 warnings.filterwarnings("ignore", category=UndefinedMetricWarning)
 
+MSE = np.square(np.subtract(y_true, y_pred)).mean()
+
+print(MSE)
