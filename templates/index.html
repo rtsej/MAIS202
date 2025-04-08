@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Political Bias Classifier</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    h1, h2 { color: #333; }
+    input[type="file"] { margin-bottom: 10px; }
+    button { padding: 6px 12px; font-size: 16px; }
+    #loading, #trainStatus { color: blue; margin-top: 10px; }
+    .error { color: red; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <h1>Political Bias Classifier</h1>
+
+  <h2>Upload Training Data</h2>
+  <p>CSV must include <code>text</code> and <code>label</code> columns.</p>
+  <input type="file" id="trainFile" accept=".csv" />
+  <button onclick="trainModel()">Train Model</button>
+  <p id="trainStatus"></p>
+
+  <hr />
+
+  <h2>Upload Data for Prediction</h2>
+  <p>CSV must include a <code>text</code> column.</p>
+  <input type="file" id="predictFile" accept=".csv" />
+  <button onclick="predict()">Analyze</button>
+  <p id="loading"></p>
+  <div id="result"></div>
+  <div class="error" id="error"></div>
+
+  <script>
+    function trainModel() {
+      const fileInput = document.getElementById("trainFile");
+      const status = document.getElementById("trainStatus");
+      status.innerText = "Training in progress...";
+
+      if (!fileInput.files.length) {
+        status.innerText = "Please select a file.";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+
+      fetch("/train", { method: "POST", body: formData })
+        .then(res => res.json())
+        .then(data => status.innerText = data.message || "Training complete.")
+        .catch(err => status.innerText = "Error: " + err);
+    }
+
+    function predict() {
+      const fileInput = document.getElementById("predictFile");
+      const resultDiv = document.getElementById("result");
+      const errorDiv = document.getElementById("error");
+      const loading = document.getElementById("loading");
+
+      resultDiv.innerHTML = "";
+      errorDiv.innerText = "";
+      loading.innerText = "Processing...";
+
+      if (!fileInput.files.length) {
+        loading.innerText = "";
+        errorDiv.innerText = "Please select a file.";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+
+      fetch("/data", { method: "POST", body: formData })
+        .then(res => res.json())
+        .then(data => {
+          loading.innerText = "";
+          if (data.error) {
+            errorDiv.innerText = data.error;
+            return;
+          }
+          let html = "<table><tr><th>Text</th><th>Prediction</th></tr>";
+          data.data.forEach(row => {
+            html += `<tr><td>${row.text}</td><td>${row.label}</td></tr>`;
+          });
+          html += "</table>";
+          resultDiv.innerHTML = html;
+        })
+        .catch(err => {
+          loading.innerText = "";
+          errorDiv.innerText = "Error: " + err;
+        });
+    }
+  </script>
+</body>
+</html>
