@@ -54,6 +54,7 @@ Run the model training or inference script
 
  python train_model.py
 
+<img width="561" alt="Screenshot 2025-04-08 at 7 59 18 PM" src="https://github.com/user-attachments/assets/e89e559c-1290-4d9e-b45d-98059a9bd585" />
 
 
 We generated this confusion matrix using sklearn.metrics after several epochs of training. This chart makes it clear that there are some issues with our dataset. Namely, upon reviewing the article bias sheet again, it became clear that the vast majority of entries (1838 out of 3371) being classified as left, with an additional 519 entries being classified as leaning left. The effect of this is displayed in the confusion matrix above, as the model has learned that its best strategy is to almost always assume a left label, with only minor allowance given to right labeled articles whose contents are exceedingly dissimilar. To attain better results, it might be preferable to either work with a dataset with a broader array of articles, or to better tailor our training data to accommodate for this discrepancy.
